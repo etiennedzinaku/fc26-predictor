@@ -5,7 +5,7 @@ Outil statique pour analyser un match FC26 à partir des statistiques saisies ma
 ## Utilisation
 
 1. Ouvre l’application servie en HTTP. Le formulaire Analyse est affiché en premier.
-2. Saisis le nom du championnat, le total de buts et le total de matchs du championnat. La moyenne utilisée est `Total_GF / Total_MP`.
+2. Saisis le nom du championnat et sa moyenne de buts par équipe et par match. Elle se calcule au besoin comme `Total_GF / Total_MP` sur l’ensemble des équipes.
 3. Pour chaque équipe, renseigne le nom, les matchs joués, les buts marqués/encaissés en saison et les trois derniers résultats. Saisis les matchs du plus récent au plus ancien.
 4. Clique sur **Analyser le match**. Le rapport affiche xG, score exacts les plus probables, 1X2, Over/Under, BTTS, estimation mi-temps et combinaisons HT/FT.
 5. Après la première analyse, les vues Dashboard et Historique apparaissent. Les analyses sont automatiquement conservées dans le stockage local du navigateur.

@@ -48,7 +48,7 @@
   .section-heading h2 { font-size: 21px; }
   .form-row { grid-template-columns: 1fr; }
   .league-fields { grid-template-columns: 1fr 1fr; }
-  .league-fields > label:first-child, .average-readout { grid-column: span 2; }
+  .league-fields > label:first-child, .league-average-help { grid-column: span 2; }
   .recent-score-grid { gap: 6px; }
   .recent-score-grid input { min-height: 33px; padding: 0 5px; font-size: 10px; }
   .team-input { padding: 14px; }

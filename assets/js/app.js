@@ -82,15 +82,6 @@ function refreshViews() {
   }
 }
 
-function updateLeagueAverage(form) {
-  const goals = Number(form.elements.namedItem("league_total_gf").value);
-  const matches = Number(form.elements.namedItem("league_total_mp").value);
-  const display = document.querySelector("#league-average-preview");
-  display.textContent = Number.isFinite(goals) && Number.isFinite(matches) && matches > 0 && goals > 0
-    ? (goals / matches).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-    : "—";
-}
-
 async function analyze(event) {
   event.preventDefault();
   const form = event.currentTarget;
@@ -99,18 +90,14 @@ async function analyze(event) {
   setBusy(button, true, "Calcul en cours…");
   try {
     const championshipName = form.elements.namedItem("league_name").value.trim();
-    const totalGoals = numberValue(form, "league_total_gf");
-    const totalMatches = numberValue(form, "league_total_mp");
-    if (totalGoals <= 0 || totalMatches <= 0) throw new RangeError("Les totaux de buts et de matchs du championnat doivent être supérieurs à zéro.");
+    const leagueAverage = Number(form.elements.namedItem("league_average").value);
+    if (!Number.isFinite(leagueAverage) || leagueAverage <= 0) throw new RangeError("La moyenne du championnat doit être un nombre positif.");
     const teamA = readTeam(form, "a");
     const teamB = readTeam(form, "b");
     if (teamA.name.toLocaleLowerCase() === teamB.name.toLocaleLowerCase()) throw new RangeError("Les deux équipes doivent être différentes.");
-    const leagueAverage = totalGoals / totalMatches;
     const output = predictMatch({ teamA, teamB, leagueAverage });
     const input = {
       championshipName,
-      leagueTotalGoals: totalGoals,
-      leagueTotalMatches: totalMatches,
       leagueAverage,
       teamA,
       teamB,
@@ -211,7 +198,6 @@ async function handleFileLink() {
 function bindEvents() {
   const form = document.querySelector("#prediction-form");
   form.addEventListener("submit", analyze);
-  form.addEventListener("input", () => updateLeagueAverage(form));
   document.querySelectorAll("[data-view-target]").forEach((button) => {
     button.addEventListener("click", () => showView(button.dataset.viewTarget));
   });
@@ -234,7 +220,6 @@ function bindEvents() {
   });
   document.querySelector("#today-date").textContent = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium" }).format(new Date());
   document.querySelector("#prediction-form").addEventListener("reset", () => window.setTimeout(() => {
-    document.querySelector("#league-average-preview").textContent = "—";
     document.querySelector("#analysis-result").replaceChildren();
   }, 0));
 }
