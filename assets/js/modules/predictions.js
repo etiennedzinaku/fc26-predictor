@@ -29,7 +29,7 @@ export function renderPredictionResult(output, teams, saved, championshipName) {
   const combinations = Object.entries(output.halfTimeFullTime.probabilities).map(([label, value]) => `<div class="combination-cell"><span>${label}</span><strong>${formatPercent(value)}</strong></div>`).join("");
   container.innerHTML = `<div class="prediction-result">
     <header class="result-header"><div><p class="eyebrow">${saved ? "ANALYSE ENREGISTRÉE" : "ANALYSE NON ENREGISTRÉE"} · ${escapeHtml(output.modelVersion)}</p>
-      <h2>${escapeHtml(teamA.name)} <span class="muted">vs</span> ${escapeHtml(teamB.name)}</h2><p>${escapeHtml(championshipName)} · ${formatDate(output.analyzedAt)} · base de buts estimée ${output.scoringBaseline.toFixed(2)}</p><p>Données complètes · ${output.completeness.recentMatchesAvailable}/6 matchs récents</p></div>
+      <h2>${escapeHtml(teamA.name)} <span class="muted">vs</span> ${escapeHtml(teamB.name)}</h2><p>${escapeHtml(championshipName)} · ${formatDate(output.analyzedAt)} · ${output.completeness.recentMatchesAvailable}/6 matchs récents</p><p>xG calculés sans moyenne de championnat</p></div>
       <div class="result-xg"><div><span>xG ${escapeHtml(teamA.name)}</span><strong>${output.expectedGoals.fullTime.teamA.toFixed(2)}</strong></div><div><span>xG ${escapeHtml(teamB.name)}</span><strong>${output.expectedGoals.fullTime.teamB.toFixed(2)}</strong></div></div></header>
     ${saved ? "" : `<div class="load-error">L’analyse est calculée mais n’a pas pu être sauvegardée dans le navigateur.</div>`}
     <section class="result-panel stats-strip"><div class="section-heading"><div><p class="eyebrow">ANALYSE STATISTIQUE</p><h3>Forces & forme récente</h3></div><span class="fine-print">Saison ${(output.configuration.seasonWeight * 100).toFixed(0)}% · forme récente ${(output.configuration.recentWeight * 100).toFixed(0)}%</span></div>
@@ -43,7 +43,7 @@ export function renderPredictionResult(output, teams, saved, championshipName) {
       <label>Cote 2<input name="odds_2" type="number" min="1.01" step="0.01" required placeholder="3.60"></label>
       <button class="button button-quiet" type="submit">Comparer</button></form><div id="odds-output" aria-live="polite"></div>
       <p class="fine-print">EV et cotes justes sont des indicateurs statistiques, pas une garantie de gain. Les probabilités brutes et normalisées sont distinguées.</p></details>
-    <div class="analysis-explanation"><strong>Hypothèses.</strong> ${output.assumptions.map(escapeHtml).join(" ")} Lambda FT = ${output.expectedGoals.fullTime.teamA.toFixed(2)}–${output.expectedGoals.fullTime.teamB.toFixed(2)} ; les buts de seconde période sont les incréments attendus après la pause.</div>
+    <div class="analysis-explanation"><strong>Calcul xG.</strong> ${output.assumptions.map(escapeHtml).join(" ")} Lambda FT = ${output.expectedGoals.fullTime.teamA.toFixed(2)}–${output.expectedGoals.fullTime.teamB.toFixed(2)} ; les buts de seconde période sont les incréments attendus après la pause.</div>
     <p class="fine-print">Une estimation statistique n’est jamais une garantie de résultat. Les marges affichées sont arrondies.</p>
   </div>`;
 }

@@ -93,11 +93,9 @@ async function analyze(event) {
     const teamA = readTeam(form, "a");
     const teamB = readTeam(form, "b");
     if (teamA.name.toLocaleLowerCase() === teamB.name.toLocaleLowerCase()) throw new RangeError("Les deux équipes doivent être différentes.");
-    const scoringBaseline = (teamA.standing.gf / teamA.standing.mp + teamB.standing.gf / teamB.standing.mp) / 2;
-    const output = predictMatch({ teamA, teamB, scoringBaseline });
+    const output = predictMatch({ teamA, teamB });
     const input = {
       championshipName,
-      scoringBaseline,
       teamA,
       teamB,
       modelConfig: MODEL_CONFIG,

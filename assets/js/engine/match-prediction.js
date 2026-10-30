@@ -21,7 +21,7 @@ function createTeamProfile(team, config) {
   };
 }
 
-export function predictMatch({ teamA, teamB, scoringBaseline: suppliedScoringBaseline }, config = MODEL_CONFIG) {
+export function predictMatch({ teamA, teamB }, config = MODEL_CONFIG) {
   if (!teamA || !teamB || teamA.id === teamB.id) {
     throw new RangeError("Choose two distinct teams.");
   }
@@ -30,12 +30,7 @@ export function predictMatch({ teamA, teamB, scoringBaseline: suppliedScoringBas
   }
   const profileA = createTeamProfile(teamA, config);
   const profileB = createTeamProfile(teamB, config);
-  const scoringBaseline = suppliedScoringBaseline
-    ?? (profileA.strength.season.goalsFor + profileB.strength.season.goalsFor) / 2;
-  if (!Number.isFinite(scoringBaseline) || scoringBaseline <= 0) {
-    throw new RangeError("The estimated scoring baseline must be finite and greater than zero.");
-  }
-  const fullTimeLambdas = calculateExpectedGoals(profileA, profileB, scoringBaseline);
+  const fullTimeLambdas = calculateExpectedGoals(profileA, profileB);
   const halfTime = estimateHalfTimeLambdas(profileA, profileB, fullTimeLambdas, config);
   const fullTimePrediction = analyzePoissonMatch(fullTimeLambdas.teamA, fullTimeLambdas.teamB, config);
   const halfTimePrediction = analyzePoissonMatch(halfTime.teamA, halfTime.teamB, config);
@@ -55,7 +50,6 @@ export function predictMatch({ teamA, teamB, scoringBaseline: suppliedScoringBas
       poissonTailTolerance: config.poissonTailTolerance,
       poissonMaxGoals: config.poissonMaxGoals,
     },
-    scoringBaseline,
     teams: [profileA, profileB],
     expectedGoals: { fullTime: fullTimeLambdas, halfTime: { teamA: halfTime.teamA, teamB: halfTime.teamB } },
     completeness: {
@@ -68,10 +62,10 @@ export function predictMatch({ teamA, teamB, scoringBaseline: suppliedScoringBas
     fullTime: fullTimePrediction,
     halfTimeFullTime,
     assumptions: [
-      "Season rates and the three most recent matches are blended using the configured 65/35 weights.",
-      "The scoring baseline is approximated from the two selected teams’ season goals-for per match; it is not the championship-wide average.",
-      "Goals in each period are independent Poisson increments; half-time estimates are smoothed from three matches.",
-      "Probabilities are model estimates, not guarantees; half-time confidence is low because the recent sample is small.",
+      "Les statistiques de saison et les trois derniers matchs sont combinés selon les pondérations configurées à 65/35.",
+      "Les buts attendus sont la moyenne arithmétique de la force offensive d’une équipe et du taux de buts encaissés par son adversaire ; aucune moyenne de championnat n’est utilisée.",
+      "Les buts de chaque période suivent des incréments de Poisson indépendants ; l’estimation de mi-temps est lissée à partir de trois matchs.",
+      "Les probabilités sont des estimations, pas des garanties ; la confiance à la mi-temps est faible vu le petit échantillon.",
     ],
   };
 }

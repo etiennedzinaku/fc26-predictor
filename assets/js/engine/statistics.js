@@ -70,37 +70,13 @@ export function blendStrength(seasonRate, recentRate, config = MODEL_CONFIG) {
   return strength;
 }
 
-export function leagueGoalAverage(standings) {
-  if (!Array.isArray(standings) || standings.length === 0) {
-    throw new RangeError("At least one standing is required to calculate the league average.");
-  }
-  const errors = standings.flatMap((standing) => validateStanding(standing));
-  if (errors.length > 0) {
-    throw new RangeError(`Incoherent league standings: ${errors.join(" ")}`);
-  }
-
-  const totalGoalsFor = standings.reduce((sum, standing) => sum + standing.gf, 0);
-  const totalMatchesPlayed = standings.reduce((sum, standing) => sum + standing.mp, 0);
-  const totalGoalsAgainst = standings.reduce((sum, standing) => sum + standing.ga, 0);
-  if (totalGoalsFor !== totalGoalsAgainst) {
-    throw new RangeError("League goals for and goals against totals do not match.");
-  }
-  if (totalMatchesPlayed <= 0) {
-    throw new RangeError("League matches played must be greater than zero.");
-  }
-  return totalGoalsFor / totalMatchesPlayed;
-}
-
-export function expectedGoals(attackA, defenseB, attackB, defenseA, scoringBaseline) {
+export function expectedGoals(attackA, defenseB, attackB, defenseA) {
   for (const [label, value] of Object.entries({ attackA, defenseB, attackB, defenseA })) {
     requireFiniteNonNegative(value, label);
   }
-  if (!Number.isFinite(scoringBaseline) || scoringBaseline <= 0) {
-    throw new RangeError("scoringBaseline must be finite and greater than zero.");
-  }
   const result = {
-    teamA: (attackA * defenseB) / scoringBaseline,
-    teamB: (attackB * defenseA) / scoringBaseline,
+    teamA: (attackA + defenseB) / 2,
+    teamB: (attackB + defenseA) / 2,
   };
   if (!Number.isFinite(result.teamA) || !Number.isFinite(result.teamB)) {
     throw new RangeError("Expected goals are outside the numerical range.");

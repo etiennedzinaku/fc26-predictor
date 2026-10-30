@@ -5,7 +5,7 @@ Outil statique pour analyser un match FC26 à partir des statistiques saisies ma
 ## Utilisation
 
 1. Ouvre l’application servie en HTTP. Le formulaire Analyse est affiché en premier.
-2. Le nom du championnat est facultatif. Aucune moyenne de championnat n’est demandée : une base approximative est dérivée automatiquement du GF/MP saisonnier des deux équipes choisies. Ce n’est pas la moyenne réelle de la compétition.
+2. Le nom du championnat est facultatif. Aucune moyenne ni donnée globale de championnat n’est demandée.
 3. Pour chaque équipe, renseigne le nom, les matchs joués, les buts marqués/encaissés en saison et les trois derniers résultats. Saisis les matchs du plus récent au plus ancien.
 4. Clique sur **Analyser le match**. Le rapport affiche xG, score exacts les plus probables, 1X2, Over/Under, BTTS, estimation mi-temps et combinaisons HT/FT.
 5. Après la première analyse, les vues Dashboard et Historique apparaissent. Les analyses sont automatiquement conservées dans le stockage local du navigateur.
@@ -26,7 +26,7 @@ GitHub Pages ne permet pas à une page statique d’écrire dans un fichier du d
 
 Les paramètres sont centralisés dans `assets/js/engine/config.js` : poids récents 50/30/20, mélange saison/forme 65/35, lissage HT et tolérance Poisson. Ces poids sont des valeurs initiales, pas des paramètres optimisés.
 
-Les buts attendus finaux utilisent `attaque équipe × défense adverse / base estimée`. Pour éviter une saisie supplémentaire, cette base est la moyenne des GF/MP saisonniers des deux équipes choisies ; ce proxy n’est pas la moyenne réelle de tout le championnat et limite la précision de l’estimation. Les résultats sont estimés par une distribution de Poisson. La queue de distribution et la masse couverte sont suivies ; les probabilités sont conditionnelles à cette masse lorsque la plage de scores est tronquée.
+Les buts attendus finaux sont la moyenne arithmétique entre la force offensive d’une équipe et le taux de buts encaissés par son adversaire. Le modèle n’utilise aucune moyenne ou statistique globale du championnat. Cette formule simple est une approximation, pas un modèle calibré sur une compétition. Les résultats sont estimés par une distribution de Poisson. La queue de distribution et la masse couverte sont suivies ; les probabilités sont conditionnelles à cette masse lorsque la plage de scores est tronquée.
 
 La mi-temps utilise les trois derniers scores MT/FT, avec lissage et ratios séparés pour les buts marqués et encaissés. Les buts de première et seconde période sont traités comme des incréments de Poisson indépendants. La confiance HT est indiquée comme faible en raison du petit échantillon.
 

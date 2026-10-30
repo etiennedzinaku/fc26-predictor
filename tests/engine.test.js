@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { blendStrength, expectedGoals, leagueGoalAverage, seasonAverages, weightedRecent } from "../assets/js/engine/statistics.js";
+import { blendStrength, expectedGoals, seasonAverages, weightedRecent } from "../assets/js/engine/statistics.js";
 import { analyzePoissonMatch, poissonDistribution, poissonProbability } from "../assets/js/engine/poisson.js";
 import { estimateHalfTimeLambdas } from "../assets/js/engine/halftime.js";
 import { halftimeFulltimeCombinations } from "../assets/js/engine/poisson.js";
@@ -31,24 +31,10 @@ test("attack and defense strengths blend season and recent rates", () => {
   assert.equal(blendStrength(2, 4), 2.7);
 });
 
-test("league average uses total goals divided by total team matches", () => {
-  const standings = [
-    { mp: 2, wins: 1, draws: 0, losses: 1, gf: 3, ga: 2, points: 3 },
-    { mp: 2, wins: 1, draws: 0, losses: 1, gf: 2, ga: 3, points: 3 },
-  ];
-  assert.equal(leagueGoalAverage(standings), 1.25);
-});
-
-test("incoherent standings block league-average calculation", () => {
-  assert.throws(() => leagueGoalAverage([
-    { mp: 2, wins: 1, draws: 0, losses: 0, gf: 2, ga: 1, points: 3 },
-  ]), /Incoherent league standings/);
-});
-
-test("expected goals are derived from attack, opposing defense, and league average", () => {
-  assert.deepEqual(expectedGoals(2, 1.5, 1, 2, 1.5), { teamA: 2, teamB: 1.3333333333333333 });
-  assert.throws(() => expectedGoals(1, 1, 1, 1, 0), /scoringBaseline/);
-  assert.throws(() => expectedGoals(Number.MAX_VALUE, Number.MAX_VALUE, 1, 1, Number.MIN_VALUE), /numerical range/);
+test("expected goals average attack and opposing goals-conceded rates", () => {
+  assert.deepEqual(expectedGoals(2, 1.5, 1, 2), { teamA: 1.75, teamB: 1.5 });
+  assert.throws(() => expectedGoals(-1, 1, 1, 1), /finite non-negative/);
+  assert.throws(() => expectedGoals(Number.MAX_VALUE, Number.MAX_VALUE, 1, 1), /numerical range/);
 });
 
 test("Poisson probabilities and covered mass are valid", () => {
@@ -121,16 +107,12 @@ test("complete match prediction is deterministic and rejects missing or mismatch
   assert.deepEqual(first.fullTime.result, second.fullTime.result);
   assert.ok(Math.abs(Object.values(first.halfTimeFullTime.probabilities)
     .reduce((sum, value) => sum + value, 0) - 100) < 1e-8);
-  assert.equal(first.scoringBaseline, 1.5);
-  assert.ok(first.assumptions.some((assumption) => assumption.includes("not the championship-wide average")));
+  assert.ok(!("scoringBaseline" in first));
+  assert.equal(first.expectedGoals.fullTime.teamA,
+    (first.teams[0].strength.attack + first.teams[1].strength.defense) / 2);
+  assert.ok(first.assumptions.some((assumption) => assumption.includes("aucune moyenne de championnat")));
   assert.throws(() => predictMatch({ ...input, teamB: { ...input.teamB, championshipId: "other" } }), /same championship/);
   assert.throws(() => predictMatch({ ...input, teamA: { ...input.teamA, recentMatches: [] } }), /three complete/);
-  const noSeasonGoals = {
-    ...input,
-    teamA: { ...input.teamA, standing: { ...standingA, gf: 0 } },
-    teamB: { ...input.teamB, standing: { ...standingB, gf: 0 } },
-  };
-  assert.throws(() => predictMatch(noSeasonGoals), /scoring baseline/);
 });
 
 test("odds analysis separates raw implied probabilities from normalized probabilities", () => {
