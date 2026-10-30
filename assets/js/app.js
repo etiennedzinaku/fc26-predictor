@@ -31,12 +31,18 @@ function createRecentInputs(side) {
   container.innerHTML = `<p class="recent-section-title">FORME RÉCENTE <span>50% / 30% / 20%</span></p>${periods.map((title, index) => {
     const matchNumber = index + 1;
     return `<fieldset class="recent-match-fields"><legend><span>${String(matchNumber).padStart(2, "0")}</span>${title}</legend><div class="recent-score-grid">
-      <label>MT pour<input name="team_${side}_recent_${matchNumber}_ht_gf" type="number" min="0" step="1" inputmode="numeric" required aria-label="${title}, buts marqués à la mi-temps"></label>
-      <label>MT contre<input name="team_${side}_recent_${matchNumber}_ht_ga" type="number" min="0" step="1" inputmode="numeric" required aria-label="${title}, buts encaissés à la mi-temps"></label>
-      <label>FT pour<input name="team_${side}_recent_${matchNumber}_gf" type="number" min="0" step="1" inputmode="numeric" required aria-label="${title}, buts marqués à la fin du match"></label>
-      <label>FT contre<input name="team_${side}_recent_${matchNumber}_ga" type="number" min="0" step="1" inputmode="numeric" required aria-label="${title}, buts encaissés à la fin du match"></label>
+      <label><span data-team-score-label="${side}-ht">Équipe ${side.toUpperCase()} · MT</span><input name="team_${side}_recent_${matchNumber}_ht_gf" type="number" min="0" step="1" inputmode="numeric" required></label>
+      <label><span>Adversaire · MT</span><input name="team_${side}_recent_${matchNumber}_ht_ga" type="number" min="0" step="1" inputmode="numeric" required></label>
+      <label><span data-team-score-label="${side}-ft">Équipe ${side.toUpperCase()} · FT</span><input name="team_${side}_recent_${matchNumber}_gf" type="number" min="0" step="1" inputmode="numeric" required></label>
+      <label><span>Adversaire · FT</span><input name="team_${side}_recent_${matchNumber}_ga" type="number" min="0" step="1" inputmode="numeric" required></label>
     </div></fieldset>`;
   }).join("")}`;
+}
+
+function updateTeamScoreLabels(side, teamName = "") {
+  const displayName = teamName.trim() || `Équipe ${side.toUpperCase()}`;
+  document.querySelector(`[data-team-score-label="${side}-ht"]`).textContent = `${displayName} · MT`;
+  document.querySelector(`[data-team-score-label="${side}-ft"]`).textContent = `${displayName} · FT`;
 }
 
 function numberValue(form, field) {
@@ -195,6 +201,10 @@ async function handleFileLink() {
 function bindEvents() {
   const form = document.querySelector("#prediction-form");
   form.addEventListener("submit", analyze);
+  form.addEventListener("input", (event) => {
+    const nameField = event.target.name.match(/^team_([ab])_name$/);
+    if (nameField) updateTeamScoreLabels(nameField[1], event.target.value);
+  });
   document.querySelectorAll("[data-view-target]").forEach((button) => {
     button.addEventListener("click", () => showView(button.dataset.viewTarget));
   });
@@ -218,6 +228,8 @@ function bindEvents() {
   document.querySelector("#today-date").textContent = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium" }).format(new Date());
   document.querySelector("#prediction-form").addEventListener("reset", () => window.setTimeout(() => {
     document.querySelector("#analysis-result").replaceChildren();
+    updateTeamScoreLabels("a");
+    updateTeamScoreLabels("b");
   }, 0));
 }
 

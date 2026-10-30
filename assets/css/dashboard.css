@@ -135,6 +135,7 @@ tbody tr:last-child td { border-bottom: 0; }
 .recent-match-fields legend span { color: var(--subtle); font-family: var(--heading); font-size: 15px; }
 .recent-score-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .recent-score-grid label { gap: 5px; font-size: 9px; }
+.recent-score-grid label > span { white-space: nowrap; }
 .recent-score-grid input { min-height: 34px; padding: 0 7px; }
 .recent-order-note { margin: 0 0 2px; color: var(--subtle); font-size: 10px; }
 .analysis-actions { margin-top: 0; }
