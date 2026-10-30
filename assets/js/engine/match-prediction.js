@@ -1,9 +1,9 @@
-import { MODEL_CONFIG } from "./config.js";
-import { calculateExpectedGoals } from "./expected-goals.js";
-import { estimateHalfTimeLambdas } from "./halftime.js";
-import { halftimeFulltimeCombinations, analyzePoissonMatch, combinePoissonPredictions } from "./poisson.js";
-import { calculateTeamStrength } from "./team-strength.js";
-import { expectedGoals } from "./statistics.js";
+import { MODEL_CONFIG } from "./config.js?v=ensemble-3";
+import { calculateExpectedGoals } from "./expected-goals.js?v=ensemble-3";
+import { estimateHalfTimeLambdas } from "./halftime.js?v=ensemble-3";
+import { halftimeFulltimeCombinations, analyzePoissonMatch, combinePoissonPredictions } from "./poisson.js?v=ensemble-3";
+import { calculateTeamStrength } from "./team-strength.js?v=ensemble-3";
+import { expectedGoals } from "./statistics.js?v=ensemble-3";
 function createTeamProfile(team, config) {
   if (!team?.id || !team.championshipId || !team.standing) {
     throw new TypeError("Each team needs an id, a championship, and season standings.");

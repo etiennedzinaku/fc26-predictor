@@ -1,9 +1,9 @@
-import { MODEL_CONFIG } from "./engine/config.js";
-import { predictMatch } from "./engine/match-prediction.js";
-import { analyzeOdds, normalizeImpliedProbabilities } from "./engine/odds-analysis.js";
+import { MODEL_CONFIG } from "./engine/config.js?v=ensemble-3";
+import { predictMatch } from "./engine/match-prediction.js?v=ensemble-3";
+import { analyzeOdds, normalizeImpliedProbabilities } from "./engine/odds-analysis.js?v=ensemble-3";
 import { readAnalyses, saveAnalysis, deleteAnalysis, downloadArchive, linkJSONFile, importArchive } from "./analysis-store.js";
 import { renderDashboard } from "./modules/dashboard.js";
-import { renderPredictionHistory, renderPredictionResult } from "./modules/predictions.js";
+import { renderPredictionHistory, renderPredictionResult } from "./modules/predictions.js?v=ensemble-3";
 import { notify, setBusy, formatDate } from "./ui.js";
 
 const state = { analyses: [] };

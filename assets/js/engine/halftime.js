@@ -1,4 +1,4 @@
-import { MODEL_CONFIG } from "./config.js";
+import { MODEL_CONFIG } from "./config.js?v=ensemble-3";
 
 function smoothedPeriodRatio(halfTimeGoals, fullTimeGoals, config) {
   if (!Number.isFinite(halfTimeGoals) || !Number.isFinite(fullTimeGoals)

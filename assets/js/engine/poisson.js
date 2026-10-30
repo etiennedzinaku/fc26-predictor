@@ -1,4 +1,4 @@
-import { MODEL_CONFIG } from "./config.js";
+import { MODEL_CONFIG } from "./config.js?v=ensemble-3";
 
 function validateLambda(lambda) {
   if (!Number.isFinite(lambda) || lambda < 0) {
