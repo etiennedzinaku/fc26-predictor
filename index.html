@@ -42,15 +42,14 @@
 
         <section class="view is-visible" id="view-analysis" data-view="analysis" aria-labelledby="analysis-title">
           <div class="page-heading">
-            <div><p class="eyebrow">MOTEUR STATISTIQUE / POISSON</p><h1 id="analysis-title">Analyser un match</h1><p class="page-subtitle">Renseigne les moyennes du championnat, la saison et les trois derniers matchs de chaque équipe.</p></div>
+            <div><p class="eyebrow">MOTEUR STATISTIQUE / POISSON</p><h1 id="analysis-title">Analyser un match</h1><p class="page-subtitle">Renseigne les statistiques de saison et les trois derniers matchs de chaque équipe.</p></div>
           </div>
           <form class="analysis-form" id="prediction-form">
             <section class="surface league-input">
-              <div class="section-heading"><div><p class="eyebrow">01 / CHAMPIONNAT</p><h2>Contexte de la compétition</h2></div><span class="formula-tag">M · moyenne championnat</span></div>
+              <div class="section-heading"><div><p class="eyebrow">01 / COMPÉTITION</p><h2>Contexte du match</h2></div><span class="formula-tag">OPTIONNEL</span></div>
               <div class="league-fields">
-                <label>Championnat<input name="league_name" required maxlength="100" placeholder="Ex. Ligue 1 · 2026/27"></label>
-                <label>Moyenne de buts par équipe et par match<input name="league_average" required type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="1.55"></label>
-                <p class="league-average-help">À calculer sur tout le championnat : total des buts marqués ÷ total des matchs joués par les équipes.</p>
+                <label>Nom du championnat<input name="league_name" maxlength="100" placeholder="Ex. Ligue 1 · 2026/27"></label>
+                <p class="league-average-help">Aucune moyenne à calculer : la base de buts est estimée automatiquement depuis le GF/MP saisonnier des deux équipes.</p>
               </div>
             </section>
 

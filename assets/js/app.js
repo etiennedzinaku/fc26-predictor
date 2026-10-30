@@ -89,16 +89,15 @@ async function analyze(event) {
   const button = form.querySelector("button[type=submit]");
   setBusy(button, true, "Calcul en cours…");
   try {
-    const championshipName = form.elements.namedItem("league_name").value.trim();
-    const leagueAverage = Number(form.elements.namedItem("league_average").value);
-    if (!Number.isFinite(leagueAverage) || leagueAverage <= 0) throw new RangeError("La moyenne du championnat doit être un nombre positif.");
+    const championshipName = form.elements.namedItem("league_name").value.trim() || "Compétition non précisée";
     const teamA = readTeam(form, "a");
     const teamB = readTeam(form, "b");
     if (teamA.name.toLocaleLowerCase() === teamB.name.toLocaleLowerCase()) throw new RangeError("Les deux équipes doivent être différentes.");
-    const output = predictMatch({ teamA, teamB, leagueAverage });
+    const scoringBaseline = (teamA.standing.gf / teamA.standing.mp + teamB.standing.gf / teamB.standing.mp) / 2;
+    const output = predictMatch({ teamA, teamB, scoringBaseline });
     const input = {
       championshipName,
-      leagueAverage,
+      scoringBaseline,
       teamA,
       teamB,
       modelConfig: MODEL_CONFIG,

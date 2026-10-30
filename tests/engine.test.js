@@ -47,7 +47,7 @@ test("incoherent standings block league-average calculation", () => {
 
 test("expected goals are derived from attack, opposing defense, and league average", () => {
   assert.deepEqual(expectedGoals(2, 1.5, 1, 2, 1.5), { teamA: 2, teamB: 1.3333333333333333 });
-  assert.throws(() => expectedGoals(1, 1, 1, 1, 0), /leagueAverage/);
+  assert.throws(() => expectedGoals(1, 1, 1, 1, 0), /scoringBaseline/);
   assert.throws(() => expectedGoals(Number.MAX_VALUE, Number.MAX_VALUE, 1, 1, Number.MIN_VALUE), /numerical range/);
 });
 
@@ -111,7 +111,6 @@ test("complete match prediction is deterministic and rejects missing or mismatch
   const standingB = { mp: 10, wins: 5, draws: 1, losses: 4, gf: 12, ga: 18, points: 16 };
   const match = (gf, ga, htGf, htGa) => ({ gf, ga, htGf, htGa });
   const input = {
-    standings: [standingA, standingB],
     teamA: { id: "a", championshipId: "league", name: "A", standing: standingA,
       recentMatches: [match(2, 0, 1, 0), match(1, 1, 0, 1), match(3, 1, 1, 0)] },
     teamB: { id: "b", championshipId: "league", name: "B", standing: standingB,
@@ -122,12 +121,16 @@ test("complete match prediction is deterministic and rejects missing or mismatch
   assert.deepEqual(first.fullTime.result, second.fullTime.result);
   assert.ok(Math.abs(Object.values(first.halfTimeFullTime.probabilities)
     .reduce((sum, value) => sum + value, 0) - 100) < 1e-8);
+  assert.equal(first.scoringBaseline, 1.5);
+  assert.ok(first.assumptions.some((assumption) => assumption.includes("not the championship-wide average")));
   assert.throws(() => predictMatch({ ...input, teamB: { ...input.teamB, championshipId: "other" } }), /same championship/);
   assert.throws(() => predictMatch({ ...input, teamA: { ...input.teamA, recentMatches: [] } }), /three complete/);
-  const standalone = predictMatch({ ...input, standings: [], leagueAverage: 1.5 });
-  assert.equal(standalone.leagueAverage, 1.5);
-  assert.equal(standalone.completeness.standingsTeams, 0);
-  assert.throws(() => predictMatch({ ...input, standings: [], leagueAverage: 0 }), /league average/);
+  const noSeasonGoals = {
+    ...input,
+    teamA: { ...input.teamA, standing: { ...standingA, gf: 0 } },
+    teamB: { ...input.teamB, standing: { ...standingB, gf: 0 } },
+  };
+  assert.throws(() => predictMatch(noSeasonGoals), /scoring baseline/);
 });
 
 test("odds analysis separates raw implied probabilities from normalized probabilities", () => {

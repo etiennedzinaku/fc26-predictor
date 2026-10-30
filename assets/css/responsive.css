@@ -6,8 +6,6 @@
   .analyze-button { align-self: end; }
   .stats-form-grid { grid-template-columns: repeat(4, minmax(55px, 1fr)); }
   .computed-fields { grid-column: span 4; }
-  .league-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .average-readout { min-height: 45px; }
 }
 @media (max-width: 820px) {
   .sidebar { position: sticky; inset: 0 0 auto; width: 100%; height: auto; padding: 10px 14px 0; border-right: 0; border-bottom: 1px solid var(--line); }
@@ -47,8 +45,7 @@
   .recent-overview, .model-overview { padding: 15px; }
   .section-heading h2 { font-size: 21px; }
   .form-row { grid-template-columns: 1fr; }
-  .league-fields { grid-template-columns: 1fr 1fr; }
-  .league-fields > label:first-child, .league-average-help { grid-column: span 2; }
+  .league-fields { grid-template-columns: 1fr; }
   .recent-score-grid { gap: 6px; }
   .recent-score-grid input { min-height: 33px; padding: 0 5px; font-size: 10px; }
   .team-input { padding: 14px; }

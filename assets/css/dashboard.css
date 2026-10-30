@@ -115,8 +115,8 @@ tbody tr:last-child td { border-bottom: 0; }
 .analysis-form { display: grid; gap: 12px; }
 .league-input { padding: 20px; }
 .formula-tag { padding: 6px 8px; border: 1px solid var(--line-strong); color: var(--green); font-size: 10px; }
-.league-fields { display: grid; grid-template-columns: 1.4fr 1fr 1fr minmax(150px, .8fr); gap: 12px; align-items: end; margin-top: 17px; }
-.league-average-help { grid-column: span 2; align-self: center; margin: 0; color: var(--subtle); font-size: 10px; line-height: 1.5; }
+.league-fields { display: grid; grid-template-columns: minmax(180px, 320px) minmax(0, 1fr); gap: 12px; align-items: center; margin-top: 17px; }
+.league-average-help { align-self: center; margin: 0; color: var(--subtle); font-size: 10px; line-height: 1.5; }
 .average-readout { display: grid; min-height: 40px; align-content: center; gap: 3px; padding: 0 11px; border-left: 2px solid var(--green); background: #20271f; }
 .average-readout span { color: var(--muted); font-size: 9px; }
 .average-readout strong { color: var(--green); font-family: var(--heading); font-size: 18px; }

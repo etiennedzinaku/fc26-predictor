@@ -91,16 +91,16 @@ export function leagueGoalAverage(standings) {
   return totalGoalsFor / totalMatchesPlayed;
 }
 
-export function expectedGoals(attackA, defenseB, attackB, defenseA, leagueAverage) {
+export function expectedGoals(attackA, defenseB, attackB, defenseA, scoringBaseline) {
   for (const [label, value] of Object.entries({ attackA, defenseB, attackB, defenseA })) {
     requireFiniteNonNegative(value, label);
   }
-  if (!Number.isFinite(leagueAverage) || leagueAverage <= 0) {
-    throw new RangeError("leagueAverage must be finite and greater than zero.");
+  if (!Number.isFinite(scoringBaseline) || scoringBaseline <= 0) {
+    throw new RangeError("scoringBaseline must be finite and greater than zero.");
   }
   const result = {
-    teamA: (attackA * defenseB) / leagueAverage,
-    teamB: (attackB * defenseA) / leagueAverage,
+    teamA: (attackA * defenseB) / scoringBaseline,
+    teamB: (attackB * defenseA) / scoringBaseline,
   };
   if (!Number.isFinite(result.teamA) || !Number.isFinite(result.teamB)) {
     throw new RangeError("Expected goals are outside the numerical range.");
