@@ -101,6 +101,14 @@ tbody tr:last-child td { border-bottom: 0; }
 .combination-cell { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 9px; background: var(--panel); color: var(--muted); font-size: 10px; }
 .combination-cell strong { color: var(--ink); }
 .analysis-explanation { padding: 16px 18px; border-left: 2px solid var(--blue); background: #172027; color: var(--muted); font-size: 11px; line-height: 1.65; }
+.winner-callout { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding: 18px 20px; border: 1px solid #536449; background: linear-gradient(110deg, #202a20, #18201b 70%, #1a2225); }
+.winner-callout .eyebrow { margin-bottom: 5px; color: var(--green); }
+.winner-callout h3 { margin: 0; font-size: 26px; }
+.winner-callout p:last-child { margin: 4px 0 0; color: var(--muted); font-size: 10px; }
+.winner-callout > strong { color: var(--green); font-family: var(--heading); font-size: 38px; }
+.model-comparison { padding: 18px; }
+.model-comparison .section-heading { margin-bottom: 14px; }
+.model-comparison td:not(:first-child) { font-variant-numeric: tabular-nums; }
 .odds-tools { padding: 16px 18px; border: 1px solid var(--line); background: var(--panel); }
 .odds-tools summary { color: var(--ink); font-size: 11px; font-weight: 600; cursor: pointer; }
 .odds-tools summary span { margin-left: 8px; color: var(--subtle); font-size: 8px; letter-spacing: .7px; }

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { blendStrength, expectedGoals, seasonAverages, weightedRecent } from "../assets/js/engine/statistics.js";
-import { analyzePoissonMatch, poissonDistribution, poissonProbability } from "../assets/js/engine/poisson.js";
+import { analyzePoissonMatch, combinePoissonPredictions, poissonDistribution, poissonProbability } from "../assets/js/engine/poisson.js";
 import { estimateHalfTimeLambdas } from "../assets/js/engine/halftime.js";
 import { halftimeFulltimeCombinations } from "../assets/js/engine/poisson.js";
 import { predictMatch } from "../assets/js/engine/match-prediction.js";
@@ -108,8 +108,15 @@ test("complete match prediction is deterministic and rejects missing or mismatch
   assert.ok(Math.abs(Object.values(first.halfTimeFullTime.probabilities)
     .reduce((sum, value) => sum + value, 0) - 100) < 1e-8);
   assert.ok(!("scoringBaseline" in first));
-  assert.equal(first.expectedGoals.fullTime.teamA,
-    (first.teams[0].strength.attack + first.teams[1].strength.defense) / 2);
+  assert.equal(first.models.length, 3);
+  assert.equal(first.ensemble.calibrated, false);
+  assert.ok(Math.abs(first.models.reduce((sum, model) => sum + model.weight, 0) - 1) < 1e-12);
+  const expectedEnsembleLambdaA = first.models.reduce((sum, model) => sum + model.weight * model.expectedGoals.teamA, 0);
+  assert.equal(first.expectedGoals.fullTime.teamA, expectedEnsembleLambdaA);
+  for (const outcome of ["teamA", "draw", "teamB"]) {
+    const averaged = first.models.reduce((sum, model) => sum + model.weight * model.result[outcome], 0);
+    assert.ok(Math.abs(first.fullTime.result[outcome] - averaged) < 1e-7);
+  }
   assert.ok(first.assumptions.some((assumption) => assumption.includes("aucune moyenne de championnat")));
   assert.throws(() => predictMatch({ ...input, teamB: { ...input.teamB, championshipId: "other" } }), /same championship/);
   assert.throws(() => predictMatch({ ...input, teamA: { ...input.teamA, recentMatches: [] } }), /three complete/);
@@ -162,4 +169,16 @@ test("JSON archive saves locally, merges by id, and deletes an analysis", async 
 test("JSON archive rejects unknown formats and malformed analysis records", async () => {
   await assert.rejects(importArchive({ text: async () => JSON.stringify({ app: "other", version: 1, analyses: [] }) }), /archive FC26 Predictor reconnue/);
   await assert.rejects(importArchive({ text: async () => "{" }), SyntaxError);
+});
+
+test("Poisson model ensemble combines score matrices and keeps probabilities normalized", () => {
+  const season = analyzePoissonMatch(1.5, 0.8);
+  const recent = analyzePoissonMatch(1.1, 1.2);
+  const mixed = analyzePoissonMatch(1.35, 0.95);
+  const ensemble = combinePoissonPredictions([season, recent, mixed], [1, 1, 1]);
+  assert.ok(Math.abs(ensemble.result.teamA + ensemble.result.draw + ensemble.result.teamB - 100) < 1e-9);
+  assert.ok(Math.abs(ensemble.btts.yes + ensemble.btts.no - 100) < 1e-9);
+  assert.ok(Math.abs(ensemble.massCovered - (season.massCovered + recent.massCovered + mixed.massCovered) / 3) < 1e-12);
+  assert.equal(ensemble.lambdaA, (season.lambdaA + recent.lambdaA + mixed.lambdaA) / 3);
+  assert.throws(() => combinePoissonPredictions([season], []), /corresponding ensemble weight/);
 });

@@ -109,6 +109,81 @@ export function analyzePoissonMatch(lambdaA, lambdaB, options = {}) {
   };
 }
 
+export function combinePoissonPredictions(predictions, weights, options = {}) {
+  if (!Array.isArray(predictions) || predictions.length === 0 || predictions.length !== weights.length) {
+    throw new RangeError("Each Poisson prediction needs one corresponding ensemble weight.");
+  }
+  if (weights.some((weight) => !Number.isFinite(weight) || weight < 0)) {
+    throw new RangeError("Ensemble weights must be finite and non-negative.");
+  }
+  const weightTotal = weights.reduce((sum, weight) => sum + weight, 0);
+  if (weightTotal <= 0) throw new RangeError("At least one ensemble weight must be positive.");
+
+  const normalizedWeights = weights.map((weight) => weight / weightTotal);
+  const scoreMass = new Map();
+  const resultMass = { "1": 0, X: 0, "2": 0 };
+  const totalsMass = new Map();
+  let bttsYes = 0;
+  let massCovered = 0;
+  let lambdaA = 0;
+  let lambdaB = 0;
+
+  predictions.forEach((prediction, index) => {
+    const weight = normalizedWeights[index];
+    massCovered += weight * prediction.massCovered;
+    lambdaA += weight * prediction.lambdaA;
+    lambdaB += weight * prediction.lambdaB;
+    for (const score of prediction.matrix) {
+      const key = `${score.goalsA}:${score.goalsB}`;
+      const probability = weight * score.probability;
+      scoreMass.set(key, (scoreMass.get(key) ?? 0) + probability);
+    }
+  });
+
+  const matrix = [...scoreMass.entries()].map(([key, probability]) => {
+    const [goalsA, goalsB] = key.split(":").map(Number);
+    const result = classifyResult(goalsA, goalsB);
+    resultMass[result] += probability;
+    totalsMass.set(goalsA + goalsB, (totalsMass.get(goalsA + goalsB) ?? 0) + probability);
+    if (goalsA > 0 && goalsB > 0) bttsYes += probability;
+    return { goalsA, goalsB, probability };
+  });
+
+  if (massCovered <= 0) throw new RangeError("The ensemble has no covered probability mass.");
+  const percentage = (mass) => (mass / massCovered) * 100;
+  const overUnder = Object.fromEntries([1.5, 2.5, 3.5].map((line) => {
+    const overMass = [...totalsMass.entries()]
+      .filter(([total]) => total > line)
+      .reduce((sum, [, mass]) => sum + mass, 0);
+    const over = percentage(overMass);
+    return [String(line), { over, under: 100 - over }];
+  }));
+  const exactScores = matrix.map(({ goalsA, goalsB, probability }) => ({
+    goalsA,
+    goalsB,
+    probability: probability / massCovered,
+  })).sort((left, right) => right.probability - left.probability);
+  const tailMass = Math.max(0, 1 - massCovered);
+  const tailTolerance = options.tailTolerance ?? options.poissonTailTolerance ?? MODEL_CONFIG.poissonTailTolerance;
+
+  return {
+    lambdaA,
+    lambdaB,
+    matrix,
+    massCovered,
+    tailMass,
+    complete: tailMass <= tailTolerance,
+    result: {
+      teamA: percentage(resultMass["1"]),
+      draw: percentage(resultMass.X),
+      teamB: percentage(resultMass["2"]),
+    },
+    overUnder,
+    btts: { yes: percentage(bttsYes), no: percentage(massCovered - bttsYes) },
+    exactScores: exactScores.slice(0, options.exactScoresToShow ?? MODEL_CONFIG.exactScoresToShow),
+  };
+}
+
 function differenceDistribution(goalsA, goalsB) {
   const differences = new Map();
   goalsA.probabilities.forEach((probabilityA, scoreA) => {
