@@ -1,0 +1,26 @@
+label { display: grid; min-width: 0; gap: 7px; color: var(--muted); font-size: 10px; font-weight: 600; }
+input, select { width: 100%; min-width: 0; min-height: 40px; padding: 0 10px; border: 1px solid var(--line-strong); border-radius: 0; background: #111613; color: var(--ink); font-size: 11px; }
+input::placeholder { color: #58625b; }
+input:hover, select:hover { border-color: #526055; }
+input:disabled, select:disabled { cursor: not-allowed; opacity: .55; }
+input[type="number"] { font-variant-numeric: tabular-nums; }
+input[type="date"] { color-scheme: dark; }
+.form-surface > label, .form-surface > .form-row, .login-form > label { margin-top: 14px; }
+.form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.optional { display: inline; margin-left: 4px; color: var(--subtle); font-size: 8px; font-weight: 500; letter-spacing: .4px; }
+.form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin-top: 17px; }
+.score-fieldset { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 15px 0 0; padding: 10px 0 0; border: 0; border-top: 1px solid var(--line); }
+.score-fieldset legend { padding: 0; color: var(--ink); font-size: 10px; font-weight: 600; }
+.score-fieldset legend span { margin-left: 4px; color: var(--subtle); font-size: 9px; font-weight: 400; }
+.score-inputs { display: flex; align-items: center; gap: 8px; }
+.score-inputs input { width: 48px; min-height: 35px; text-align: center; }
+.score-inputs span { color: var(--subtle); }
+.standings-editor label { gap: 5px; }
+.standings-editor input, .standings-editor select { min-height: 36px; }
+.standings-editor .form-actions { margin-top: 12px; }
+.compact-filter select { min-height: 33px; }
+.login-form label { margin-top: 15px; }
+.login-form .login-submit { min-height: 45px; }
+.auth-notice.is-error { border-color: #754240; background: #241817; color: var(--red); }
+.auth-notice.is-success { border-color: #43513e; background: #1b2419; color: var(--green); }
+.auth-notice.is-info { border-color: #36506a; background: #172027; color: var(--blue); }

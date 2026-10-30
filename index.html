@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101312">
+    <meta name="description" content="Analyse statistique de matchs FC26 avec tes données manuelles.">
+    <title>FC26 Predictor | Analyse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/forms.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <script type="module" src="assets/js/app.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Navigation principale">
+        <a class="brand" href="index.html" aria-label="FC26 Predictor, accueil">
+          <span class="brand-mark">FC<span>26</span></span>
+          <span class="brand-name">PREDICTOR</span>
+        </a>
+        <div class="sidebar-label">ANALYSE LOCALE</div>
+        <nav class="primary-nav">
+          <button class="nav-link is-active" type="button" data-view-target="analysis"><span class="nav-index">01</span>Analyser un match</button>
+          <button class="nav-link" type="button" data-view-target="overview" id="dashboard-nav" hidden><span class="nav-index">02</span>Dashboard</button>
+          <button class="nav-link" type="button" data-view-target="history" id="history-nav" hidden><span class="nav-index">03</span>Historique</button>
+        </nav>
+        <div class="sidebar-spacer"></div>
+        <div class="model-status"><span class="status-dot"></span><span>MODÈLE 1.0</span><span class="status-caption">Calcul local · Poisson</span></div>
+        <div class="local-storage-note"><strong id="stored-count">0 analyse</strong><span>gardée sur cet appareil</span></div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div class="breadcrumb"><span>FC26</span><span class="breadcrumb-divider">/</span><strong id="current-view-title">Analyser un match</strong></div>
+          <div class="topbar-meta"><span class="live-indicator"></span><span>SAUVEGARDE LOCALE</span><time id="today-date"></time></div>
+        </header>
+        <div class="local-notice" role="status"><strong>Sans compte, sans serveur.</strong><span>Les analyses sont gardées dans ce navigateur. Exporte le JSON pour les sauvegarder dans un fichier ou les transférer.</span></div>
+
+        <section class="view is-visible" id="view-analysis" data-view="analysis" aria-labelledby="analysis-title">
+          <div class="page-heading">
+            <div><p class="eyebrow">MOTEUR STATISTIQUE / POISSON</p><h1 id="analysis-title">Analyser un match</h1><p class="page-subtitle">Renseigne les moyennes du championnat, la saison et les trois derniers matchs de chaque équipe.</p></div>
+          </div>
+          <form class="analysis-form" id="prediction-form">
+            <section class="surface league-input">
+              <div class="section-heading"><div><p class="eyebrow">01 / CHAMPIONNAT</p><h2>Contexte de la compétition</h2></div><span class="formula-tag">Total_GF ÷ Total_MP</span></div>
+              <div class="league-fields">
+                <label>Championnat<input name="league_name" required maxlength="100" placeholder="Ex. Ligue 1 · 2026/27"></label>
+                <label>Total des buts marqués<input name="league_total_gf" required type="number" min="1" step="1" inputmode="numeric" placeholder="125"></label>
+                <label>Total des matchs joués<input name="league_total_mp" required type="number" min="1" step="1" inputmode="numeric" placeholder="90"></label>
+                <div class="average-readout"><span>Moyenne par équipe / match</span><strong id="league-average-preview">—</strong></div>
+              </div>
+            </section>
+
+            <div class="team-input-grid">
+              <fieldset class="surface team-input">
+                <legend><span class="team-number">A</span>Équipe A</legend>
+                <label>Nom de l’équipe<input name="team_a_name" required maxlength="100" placeholder="Arsenal"></label>
+                <div class="season-fields">
+                  <label>MP<input name="team_a_mp" required type="number" min="1" step="1" inputmode="numeric" placeholder="10"></label>
+                  <label>GF<input name="team_a_gf" required type="number" min="0" step="1" inputmode="numeric" placeholder="21"></label>
+                  <label>GA<input name="team_a_ga" required type="number" min="0" step="1" inputmode="numeric" placeholder="12"></label>
+                </div>
+                <div class="recent-inputs" id="team-a-recent-fields"></div>
+              </fieldset>
+              <fieldset class="surface team-input">
+                <legend><span class="team-number team-number--second">B</span>Équipe B</legend>
+                <label>Nom de l’équipe<input name="team_b_name" required maxlength="100" placeholder="Liverpool"></label>
+                <div class="season-fields">
+                  <label>MP<input name="team_b_mp" required type="number" min="1" step="1" inputmode="numeric" placeholder="10"></label>
+                  <label>GF<input name="team_b_gf" required type="number" min="0" step="1" inputmode="numeric" placeholder="18"></label>
+                  <label>GA<input name="team_b_ga" required type="number" min="0" step="1" inputmode="numeric" placeholder="14"></label>
+                </div>
+                <div class="recent-inputs" id="team-b-recent-fields"></div>
+              </fieldset>
+            </div>
+            <p class="recent-order-note">Pour chaque équipe, saisis les rencontres de la plus récente à la plus ancienne. Les scores finaux incluent le temps additionnel.</p>
+            <div class="form-actions analysis-actions"><button class="button button-primary" type="submit">Analyser le match <span aria-hidden="true">↗</span></button><button class="button button-quiet" type="reset">Effacer les champs</button></div>
+          </form>
+          <div id="analysis-result" aria-live="polite"></div>
+          <div class="disclaimer"><span>!</span><p>Une estimation mathématique n’est jamais une garantie de résultat.</p></div>
+        </section>
+
+        <section class="view" id="view-overview" data-view="overview" aria-labelledby="overview-title" hidden>
+          <div class="page-heading">
+            <div><p class="eyebrow">ANALYSES / SYNTHÈSE</p><h1 id="overview-title">Ton dashboard.</h1><p class="page-subtitle">Les résultats calculés sur cet appareil.</p></div>
+            <div class="file-actions"><button class="button button-quiet" type="button" id="link-json-button">Lier un fichier</button><button class="button button-quiet" type="button" id="import-json-button">Importer JSON</button><button class="button button-primary" type="button" id="export-json-button">Exporter JSON <span aria-hidden="true">↓</span></button><input id="import-json-input" type="file" accept="application/json,.json" hidden></div>
+          </div>
+          <div class="metric-grid" id="overview-metrics"></div>
+          <div class="overview-grid">
+            <section class="surface recent-overview"><div class="section-heading"><div><p class="eyebrow">ACTIVITÉ</p><h2>Analyses récentes</h2></div><button class="text-button" type="button" data-view-target="history">Tout voir ↗</button></div><div id="overview-predictions" class="compact-list"></div></section>
+            <section class="surface model-overview"><p class="eyebrow">MODÈLE STATISTIQUE</p><h2>Une estimation, jamais une certitude.</h2><p>Le moteur combine les statistiques de saison et les trois derniers matchs. Il calcule la distribution des scores et les scénarios mi-temps / fin du match.</p><div class="model-weights"><span><b>65%</b> saison</span><span><b>35%</b> forme récente</span></div><p class="fine-print">L’analyse reste sur cet appareil. Exporte régulièrement le JSON pour en garder une copie.</p></section>
+          </div>
+          <section class="surface history-section"><div class="section-heading"><div><p class="eyebrow">ÉVALUATION</p><h2>Résultats réels</h2></div></div><p id="evaluation-summary" class="evaluation-summary">Les analyses ne sont pas encore évaluées. Les résultats réels ne sont pas saisis dans cette version légère.</p></section>
+        </section>
+
+        <section class="view" id="view-history" data-view="history" aria-labelledby="history-title" hidden>
+          <div class="page-heading"><div><p class="eyebrow">ARCHIVE LOCALE</p><h1 id="history-title">Historique</h1><p class="page-subtitle">Les analyses sauvegardées dans ce navigateur ou importées depuis un JSON.</p></div><button class="button button-primary" type="button" id="history-export-button">Exporter JSON ↓</button></div>
+          <section class="surface table-surface"><div id="prediction-history" class="prediction-history"></div></section>
+        </section>
+      </main>
+    </div>
+    <aside id="notifications" class="notification-region" aria-live="polite" aria-relevant="additions"></aside>
+  </body>
+</html>
