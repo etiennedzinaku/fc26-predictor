@@ -2,8 +2,8 @@ import { MODEL_CONFIG } from "./engine/config.js?v=ensemble-3";
 import { predictMatch } from "./engine/match-prediction.js?v=ensemble-3";
 import { analyzeOdds, normalizeImpliedProbabilities } from "./engine/odds-analysis.js?v=ensemble-3";
 import { readAnalyses, saveAnalysis, deleteAnalysis, downloadArchive, linkJSONFile, importArchive } from "./analysis-store.js";
-import { renderDashboard } from "./modules/dashboard.js";
-import { renderPredictionHistory, renderPredictionResult } from "./modules/predictions.js?v=ensemble-3";
+import { renderDashboard } from "./modules/dashboard.js?v=learning-5";
+import { renderPredictionHistory, renderPredictionResult } from "./modules/predictions.js?v=learning-5";
 import { notify, setBusy, formatDate } from "./ui.js";
 
 const state = { analyses: [] };
@@ -30,7 +30,11 @@ function createRecentInputs(side) {
   const periods = ["Dernier match", "Deuxième match", "Troisième match"];
   container.innerHTML = `<p class="recent-section-title">FORME RÉCENTE <span>50% / 30% / 20%</span></p>${periods.map((title, index) => {
     const matchNumber = index + 1;
-    return `<fieldset class="recent-match-fields"><legend><span>${String(matchNumber).padStart(2, "0")}</span>${title}</legend><div class="recent-score-grid">
+    return `<fieldset class="recent-match-fields"><legend><span>${String(matchNumber).padStart(2, "0")}</span>${title}</legend><div class="recent-context-grid">
+      <label>Adversaire (facultatif)<input name="team_${side}_recent_${matchNumber}_opponent" maxlength="100" placeholder="Nom de l’adversaire"></label>
+      <label>Date (facultative)<input name="team_${side}_recent_${matchNumber}_date" type="date"></label>
+      <label>Lieu<select name="team_${side}_recent_${matchNumber}_venue"><option value="unknown">Non précisé</option><option value="home">Domicile</option><option value="away">Extérieur</option></select></label>
+    </div><div class="recent-score-grid">
       <label><span data-team-score-label="${side}-ht">Équipe ${side.toUpperCase()} · MT</span><input name="team_${side}_recent_${matchNumber}_ht_gf" type="number" min="0" step="1" inputmode="numeric" required></label>
       <label><span>Adversaire · MT</span><input name="team_${side}_recent_${matchNumber}_ht_ga" type="number" min="0" step="1" inputmode="numeric" required></label>
       <label><span data-team-score-label="${side}-ft">Équipe ${side.toUpperCase()} · FT</span><input name="team_${side}_recent_${matchNumber}_gf" type="number" min="0" step="1" inputmode="numeric" required></label>
@@ -64,6 +68,9 @@ function readTeam(form, side) {
       htGa: numberValue(form, `${prefix}_ht_ga`),
       gf: numberValue(form, `${prefix}_gf`),
       ga: numberValue(form, `${prefix}_ga`),
+      opponent: form.elements.namedItem(`${prefix}_opponent`).value.trim(),
+      date: form.elements.namedItem(`${prefix}_date`).value || null,
+      venue: form.elements.namedItem(`${prefix}_venue`).value,
     };
     if (match.htGf > match.gf || match.htGa > match.ga) {
       throw new RangeError(`${name}, ${matchNumber === 1 ? "dernier match" : `${matchNumber}e match`} : un score MT ne peut pas dépasser son score final.`);
@@ -223,6 +230,40 @@ function bindEvents() {
       if (deleted.fileError) notify(`Le fichier lié n’a pas été mis à jour : ${deleted.fileError}`, "error");
     } catch (error) {
       notify(error.message, "error");
+    }
+  });
+  document.querySelector("#prediction-history").addEventListener("submit", async (event) => {
+    const form = event.target.closest("[data-save-result]");
+    if (!form) return;
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    const button = form.querySelector("button[type=submit]");
+    setBusy(button, true, "Enregistrement…");
+    try {
+      const readScore = (name) => {
+        const score = Number(form.elements.namedItem(name).value);
+        if (!Number.isInteger(score) || score < 0) throw new RangeError("Les scores réels doivent être des entiers positifs ou nuls.");
+        return score;
+      };
+      const ht = { teamA: readScore("ht_team_a"), teamB: readScore("ht_team_b") };
+      const ft = { teamA: readScore("ft_team_a"), teamB: readScore("ft_team_b") };
+      if (ht.teamA > ft.teamA || ht.teamB > ft.teamB) {
+        throw new RangeError("Un score à la mi-temps ne peut pas dépasser le score final correspondant.");
+      }
+      const analysis = state.analyses.find((item) => item.id === form.dataset.saveResult);
+      if (!analysis) throw new Error("Cette analyse n’existe plus dans l’archive locale. Actualise l’historique.");
+      const saved = await saveAnalysis({
+        ...analysis,
+        actualResult: { ht, ft, recordedAt: new Date().toISOString() },
+      });
+      state.analyses = saved.analyses;
+      refreshViews();
+      notify("Score réel enregistré. Les métriques et le backtest ont été actualisés.", "success");
+      if (saved.fileError) notify(`La copie dans le fichier JSON lié a échoué : ${saved.fileError}. Exporte une archive.`, "error");
+    } catch (error) {
+      notify(error.message, "error");
+    } finally {
+      setBusy(button, false);
     }
   });
   document.querySelector("#today-date").textContent = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium" }).format(new Date());

@@ -6,7 +6,7 @@ import { estimateHalfTimeLambdas } from "../assets/js/engine/halftime.js";
 import { halftimeFulltimeCombinations } from "../assets/js/engine/poisson.js";
 import { predictMatch } from "../assets/js/engine/match-prediction.js";
 import { analyzeOdds, normalizeImpliedProbabilities } from "../assets/js/engine/odds-analysis.js";
-import { evaluatePredictions } from "../assets/js/engine/evaluation.js";
+import { evaluateAnalysisArchive, evaluatePredictions } from "../assets/js/engine/evaluation.js";
 import { deleteAnalysis, importArchive, readAnalyses, saveAnalysis, serializeArchive } from "../assets/js/analysis-store.js";
 
 const localValues = new Map();
@@ -145,6 +145,57 @@ test("model evaluation reports Brier, log loss, accuracy, and calibration", () =
   assert.equal(metrics.accuracy, 0.5);
   assert.ok(metrics.calibration.length > 0);
   assert.throws(() => evaluatePredictions([{ probabilities: { "1": 0.8, X: 0.3, "2": 0 }, actual: "1" }]), /sum to one/);
+});
+
+test("archive evaluation measures HT/FT scores and uses only prior matches for walk-forward weights", () => {
+  const analysisFor = (index, actual) => {
+    const createdAt = new Date(Date.UTC(2026, 0, index + 1)).toISOString();
+    return {
+      id: `match-${index}`,
+      createdAt,
+      actualResult: {
+        recordedAt: new Date(Date.UTC(2026, 0, index + 1, 12)).toISOString(),
+        ht: { teamA: actual === "1" ? 1 : 0, teamB: actual === "2" ? 1 : 0 },
+        ft: { teamA: actual === "1" ? 2 : 0, teamB: actual === "2" ? 2 : 0 },
+      },
+      output: {
+      fullTime: {
+        result: { teamA: 40, draw: 20, teamB: 40 },
+        massCovered: 1,
+        matrix: [{ goalsA: 2, goalsB: 0, probability: 0.2 }, { goalsA: 0, goalsB: 2, probability: 0.2 }],
+      },
+      halfTime: { result: { teamA: 40, draw: 20, teamB: 40 }, massCovered: 1,
+        matrix: [{ goalsA: 1, goalsB: 0, probability: 0.2 }, { goalsA: 0, goalsB: 1, probability: 0.2 }] },
+      expectedGoals: { fullTime: { teamA: 1, teamB: 1 }, halfTime: { teamA: 0.5, teamB: 0.5 } },
+      models: [
+        { id: "season", result: { teamA: 80, draw: 10, teamB: 10 } },
+        { id: "recent", result: { teamA: 10, draw: 10, teamB: 80 } },
+        { id: "mixed", result: { teamA: 45, draw: 10, teamB: 45 } },
+      ],
+      },
+    };
+  };
+  const analyses = Array.from({ length: 7 }, (_, index) => analysisFor(index, index % 2 ? "2" : "1"));
+  const evaluation = evaluateAnalysisArchive(analyses, { minimumTrainingMatches: 5, weightStep: 0.5 });
+  assert.equal(evaluation.completedCount, 7);
+  assert.equal(evaluation.fullTime.count, 7);
+  assert.equal(evaluation.halfTime.count, 7);
+  assert.equal(evaluation.walkForward.evaluatedCount, 2);
+  assert.deepEqual(evaluation.walkForward.records.map((record) => record.trainingCount), [5, 6]);
+  assert.ok(evaluation.walkForward.records.every((record) => Object.values(record.weights).reduce((sum, weight) => sum + weight, 0) === 1));
+  assert.equal(evaluation.walkForward.calibrated, false);
+
+  const changedLastResult = analyses.map((analysis) => structuredClone(analysis));
+  changedLastResult.at(-1).actualResult.ft = { teamA: 2, teamB: 0 };
+  const changedEvaluation = evaluateAnalysisArchive(changedLastResult, { minimumTrainingMatches: 5, weightStep: 0.5 });
+  assert.deepEqual(evaluation.walkForward.records.at(-1).weights, changedEvaluation.walkForward.records.at(-1).weights);
+
+  const lateScores = analyses.map((analysis) => ({
+    ...analysis,
+    actualResult: { ...analysis.actualResult, recordedAt: "2027-01-01T00:00:00.000Z" },
+  }));
+  const noAvailableTraining = evaluateAnalysisArchive(lateScores, { minimumTrainingMatches: 5, weightStep: 0.5 });
+  assert.equal(noAvailableTraining.walkForward.evaluatedCount, 0);
 });
 
 test("JSON archive saves locally, merges by id, and deletes an analysis", async () => {

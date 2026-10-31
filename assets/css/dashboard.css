@@ -120,6 +120,15 @@ tbody tr:last-child td { border-bottom: 0; }
 .history-section { margin-top: 13px; padding: 18px 20px; }
 .history-section .section-heading { margin-bottom: 12px; }
 .evaluation-summary { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.65; }
+.evaluation-summary > p { margin: 8px 0; }
+.evaluation-metrics { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 12px 0; padding: 12px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.evaluation-metrics > span { display: grid; gap: 4px; color: var(--subtle); font-size: 9px; }
+.evaluation-metrics strong { color: var(--green); font-family: var(--heading); font-size: 18px; }
+.calibration-summary { display: flex; flex-wrap: wrap; gap: 6px 12px; color: var(--muted); font-size: 10px; }
+.calibration-summary > span { padding: 4px 7px; border: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.calibration-summary small { color: var(--subtle); }
+.walk-forward-summary { margin-top: 14px; padding: 12px; border-left: 2px solid var(--blue); background: #172027; color: var(--muted); font-size: 10px; }
+.walk-forward-summary > strong { display: block; margin-bottom: 6px; color: var(--blue); font-size: 11px; }
 .analysis-form { display: grid; gap: 12px; }
 .league-input { padding: 20px; }
 .formula-tag { padding: 6px 8px; border: 1px solid var(--line-strong); color: var(--green); font-size: 10px; }
@@ -141,14 +150,25 @@ tbody tr:last-child td { border-bottom: 0; }
 .recent-match-fields { margin: 0; padding: 12px 0; border: 0; border-top: 1px solid var(--line); }
 .recent-match-fields legend { display: flex; align-items: center; gap: 8px; padding: 0 8px 0 0; color: var(--ink); font-size: 10px; font-weight: 600; }
 .recent-match-fields legend span { color: var(--subtle); font-family: var(--heading); font-size: 15px; }
+.recent-context-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, .8fr)); gap: 8px; margin-bottom: 10px; }
+.recent-context-grid label { gap: 5px; font-size: 9px; }
+.recent-context-grid input, .recent-context-grid select { min-height: 32px; padding: 0 7px; font-size: 10px; }
 .recent-score-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .recent-score-grid label { gap: 5px; font-size: 9px; }
 .recent-score-grid label > span { white-space: nowrap; }
 .recent-score-grid input { min-height: 34px; padding: 0 7px; }
 .recent-order-note { margin: 0 0 2px; color: var(--subtle); font-size: 10px; }
 .analysis-actions { margin-top: 0; }
-.history-item { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 20px; align-items: center; padding: 15px 0; border-top: 1px solid var(--line); }
+.history-item { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 15px 0; border-top: 1px solid var(--line); }
+.history-forecast { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 20px; align-items: center; }
 .history-item strong { display: block; font-size: 12px; }
 .history-item small { display: block; margin-top: 5px; color: var(--subtle); font-size: 10px; }
 .history-score { color: var(--green); font-family: var(--heading); font-size: 21px; }
 .history-confidence { color: var(--orange); font-size: 10px; }
+.actual-score-summary { color: var(--green) !important; }
+.actual-result-entry { padding-top: 10px; border-top: 1px solid var(--line); }
+.actual-result-entry summary { width: fit-content; color: var(--green); font-size: 10px; font-weight: 600; cursor: pointer; }
+.actual-result-form { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; padding-top: 11px; }
+.actual-score-grid { display: grid; grid-template-columns: repeat(4, minmax(90px, 1fr)); gap: 8px; flex: 1 1 480px; }
+.actual-score-grid label { gap: 5px; font-size: 9px; }
+.actual-score-grid input { min-height: 34px; }

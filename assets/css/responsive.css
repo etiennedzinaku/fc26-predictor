@@ -48,6 +48,8 @@
   .league-fields { grid-template-columns: 1fr; }
   .recent-score-grid { gap: 6px; }
   .recent-score-grid input { min-height: 33px; padding: 0 5px; font-size: 10px; }
+  .recent-context-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .recent-context-grid label:first-child { grid-column: span 2; }
   .team-input { padding: 14px; }
   .file-actions { width: 100%; }
   .file-actions .button { flex: 1 1 auto; padding: 0 8px; font-size: 9px; }
@@ -63,6 +65,8 @@
   .result-xg { gap: 10px; }
   .history-item { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
   .history-confidence { grid-column: 1 / -1; }
+  .history-forecast { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+  .actual-score-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .compact-filter { max-width: 46%; }
   .compact-filter select { min-width: 0; max-width: 115px; }
   .login-form { padding: 22px; }

@@ -62,8 +62,16 @@ export function renderPredictionHistory(analyses) {
     ? analyses.map((analysis) => {
       const top = analysis.output?.fullTime?.exactScores?.[0];
       const [teamA, teamB] = analysis.output?.teams ?? [];
-      return `<article class="history-item"><span><strong>${escapeHtml(teamA?.name ?? "Équipe A")} vs ${escapeHtml(teamB?.name ?? "Équipe B")}</strong><small>${escapeHtml(analysis.championshipName)} · ${formatDate(analysis.createdAt)} · Modèle ${escapeHtml(analysis.output.modelVersion)}</small></span>
-        <strong class="history-score">${top ? `${top.goalsA}–${top.goalsB}` : "—"}</strong><span class="history-confidence">MT : confiance faible <button class="icon-action icon-action--danger" type="button" data-delete-analysis="${escapeHtml(analysis.id)}">Supprimer</button></span></article>`;
+      const actual = analysis.actualResult;
+      return `<article class="history-item"><div class="history-forecast"><span><strong>${escapeHtml(teamA?.name ?? "Équipe A")} vs ${escapeHtml(teamB?.name ?? "Équipe B")}</strong><small>${escapeHtml(analysis.championshipName)} · ${formatDate(analysis.createdAt)} · Modèle ${escapeHtml(analysis.output.modelVersion)}</small>${actual ? `<small class="actual-score-summary">Réel : MT ${actual.ht.teamA}–${actual.ht.teamB} · FT ${actual.ft.teamA}–${actual.ft.teamB} · saisi ${formatDate(actual.recordedAt)}</small>` : ""}</span>
+        <strong class="history-score">${top ? `${top.goalsA}–${top.goalsB}` : "—"}</strong><span class="history-confidence">MT : confiance faible <button class="icon-action icon-action--danger" type="button" data-delete-analysis="${escapeHtml(analysis.id)}">Supprimer</button></span></div>
+        <details class="actual-result-entry" ${actual ? "" : "open"}><summary>${actual ? "Modifier le score réel" : "Saisir le score réel du match"}</summary>
+          <form class="actual-result-form" data-save-result="${escapeHtml(analysis.id)}"><div class="actual-score-grid">
+            <label>${escapeHtml(teamA?.name ?? "Équipe A")} · MT<input name="ht_team_a" type="number" min="0" step="1" inputmode="numeric" required value="${actual?.ht.teamA ?? ""}"></label>
+            <label>${escapeHtml(teamB?.name ?? "Équipe B")} · MT<input name="ht_team_b" type="number" min="0" step="1" inputmode="numeric" required value="${actual?.ht.teamB ?? ""}"></label>
+            <label>${escapeHtml(teamA?.name ?? "Équipe A")} · FT<input name="ft_team_a" type="number" min="0" step="1" inputmode="numeric" required value="${actual?.ft.teamA ?? ""}"></label>
+            <label>${escapeHtml(teamB?.name ?? "Équipe B")} · FT<input name="ft_team_b" type="number" min="0" step="1" inputmode="numeric" required value="${actual?.ft.teamB ?? ""}"></label>
+          </div><button class="button button-quiet" type="submit">${actual ? "Mettre à jour le résultat" : "Enregistrer le résultat"}</button></form></details></article>`;
     }).join("")
     : `<div class="empty-state"><strong>Historique vide</strong>Les analyses apparaîtront ici après leur sauvegarde locale.</div>`;
 }
