@@ -150,7 +150,7 @@ tbody tr:last-child td { border-bottom: 0; }
 .recent-match-fields { margin: 0; padding: 12px 0; border: 0; border-top: 1px solid var(--line); }
 .recent-match-fields legend { display: flex; align-items: center; gap: 8px; padding: 0 8px 0 0; color: var(--ink); font-size: 10px; font-weight: 600; }
 .recent-match-fields legend span { color: var(--subtle); font-family: var(--heading); font-size: 15px; }
-.recent-context-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, .8fr)); gap: 8px; margin-bottom: 10px; }
+.recent-context-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, .8fr); gap: 8px; margin-bottom: 10px; }
 .recent-context-grid label { gap: 5px; font-size: 9px; }
 .recent-context-grid input, .recent-context-grid select { min-height: 32px; padding: 0 7px; font-size: 10px; }
 .recent-score-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }

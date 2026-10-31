@@ -6,7 +6,7 @@ Outil statique pour analyser un match FC26 à partir des statistiques saisies ma
 
 1. Ouvre l’application servie en HTTP. Le formulaire Analyse est affiché en premier.
 2. Le nom du championnat est facultatif. Aucune moyenne ni donnée globale de championnat n’est demandée.
-3. Pour chaque équipe, renseigne le nom, les matchs joués, les buts marqués/encaissés en saison et les trois derniers résultats. Saisis les matchs du plus récent au plus ancien. L’adversaire, la date et le lieu sont facultatifs et archivés pour les analyses futures ; ils ne changent pas encore le calcul.
+3. Pour chaque équipe, renseigne le nom, les matchs joués, les buts marqués/encaissés en saison et les trois derniers résultats. Saisis les matchs du plus récent au plus ancien. L’adversaire et le lieu sont facultatifs et archivés pour les analyses futures ; ils ne changent pas encore le calcul. Aucune date n’est demandée.
 4. Clique sur **Analyser le match**. Le rapport affiche xG, score exacts les plus probables, 1X2, Over/Under, BTTS, estimation mi-temps et combinaisons HT/FT.
 5. Après la première analyse, les vues Dashboard et Historique apparaissent. Les analyses sont automatiquement conservées dans le stockage local du navigateur.
 
@@ -37,7 +37,7 @@ Le backtest walk-forward compare des pondérations candidates des trois variante
 
 La mi-temps utilise les trois derniers scores MT/FT, avec lissage et ratios séparés pour les buts marqués et encaissés. Les buts de première et seconde période sont traités comme des incréments de Poisson indépendants. La confiance HT est indiquée comme faible en raison du petit échantillon.
 
-Le modèle n’applique aucun coefficient de durée ou d’avantage à domicile. Les analyses sauvegardent l’entrée exacte et la version du modèle afin de pouvoir les reproduire. L’adversaire, la date et le lieu des matchs récents sont archivés s’ils sont renseignés, mais ne sont pas encore utilisés dans les calculs.
+Le modèle n’applique aucun coefficient de durée ou d’avantage à domicile. Les analyses sauvegardent l’entrée exacte et la version du modèle afin de pouvoir les reproduire. L’adversaire et le lieu des matchs récents sont archivés s’ils sont renseignés, mais ne sont pas encore utilisés dans les calculs.
 
 ## Lancer localement
 

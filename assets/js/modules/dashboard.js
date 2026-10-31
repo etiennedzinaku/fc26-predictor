@@ -1,5 +1,5 @@
 import { escapeHtml, formatDate, formatPercent } from "../ui.js";
-import { evaluateAnalysisArchive } from "../engine/evaluation.js?v=learning-5";
+import { evaluateAnalysisArchive } from "../engine/evaluation.js?v=learning-6";
 
 export function renderDashboard(analyses) {
   const uniqueTeams = new Set(analyses.flatMap((analysis) => analysis.output.teams.map((team) => team.name)));

@@ -2,8 +2,8 @@ import { MODEL_CONFIG } from "./engine/config.js?v=ensemble-3";
 import { predictMatch } from "./engine/match-prediction.js?v=ensemble-3";
 import { analyzeOdds, normalizeImpliedProbabilities } from "./engine/odds-analysis.js?v=ensemble-3";
 import { readAnalyses, saveAnalysis, deleteAnalysis, downloadArchive, linkJSONFile, importArchive } from "./analysis-store.js";
-import { renderDashboard } from "./modules/dashboard.js?v=learning-5";
-import { renderPredictionHistory, renderPredictionResult } from "./modules/predictions.js?v=learning-5";
+import { renderDashboard } from "./modules/dashboard.js?v=learning-6";
+import { renderPredictionHistory, renderPredictionResult } from "./modules/predictions.js?v=learning-6";
 import { notify, setBusy, formatDate } from "./ui.js";
 
 const state = { analyses: [] };
@@ -32,7 +32,6 @@ function createRecentInputs(side) {
     const matchNumber = index + 1;
     return `<fieldset class="recent-match-fields"><legend><span>${String(matchNumber).padStart(2, "0")}</span>${title}</legend><div class="recent-context-grid">
       <label>Adversaire (facultatif)<input name="team_${side}_recent_${matchNumber}_opponent" maxlength="100" placeholder="Nom de l’adversaire"></label>
-      <label>Date (facultative)<input name="team_${side}_recent_${matchNumber}_date" type="date"></label>
       <label>Lieu<select name="team_${side}_recent_${matchNumber}_venue"><option value="unknown">Non précisé</option><option value="home">Domicile</option><option value="away">Extérieur</option></select></label>
     </div><div class="recent-score-grid">
       <label><span data-team-score-label="${side}-ht">Équipe ${side.toUpperCase()} · MT</span><input name="team_${side}_recent_${matchNumber}_ht_gf" type="number" min="0" step="1" inputmode="numeric" required></label>
@@ -69,7 +68,6 @@ function readTeam(form, side) {
       gf: numberValue(form, `${prefix}_gf`),
       ga: numberValue(form, `${prefix}_ga`),
       opponent: form.elements.namedItem(`${prefix}_opponent`).value.trim(),
-      date: form.elements.namedItem(`${prefix}_date`).value || null,
       venue: form.elements.namedItem(`${prefix}_venue`).value,
     };
     if (match.htGf > match.gf || match.htGa > match.ga) {
